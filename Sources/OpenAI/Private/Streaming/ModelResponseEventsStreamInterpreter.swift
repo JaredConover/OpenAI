@@ -13,12 +13,16 @@ final class ModelResponseEventsStreamInterpreter: @unchecked Sendable, StreamInt
     private var onEventDispatched: ((ResponseStreamEvent) -> Void)?
     private var onError: ((Error) -> Void)?
     private let decoder = JSONDecoder()
+    private let parsingOptions: ParsingOptions
     
     enum InterpreterError: DescribedError {
         case unknownEventType(String)
     }
     
-    init () {
+    init (parsingOptions: ParsingOptions) {
+        self.parsingOptions = parsingOptions
+        self.decoder.userInfo[.parsingOptions] = parsingOptions
+
         parser.setCallbackClosures { [weak self] event in
             guard let self else {
                 return
@@ -206,7 +210,7 @@ final class ModelResponseEventsStreamInterpreter: @unchecked Sendable, StreamInt
     }
     
     private func decode<T: Codable>(data: Data) throws -> T {
-        try decoder.decode(T.self, from: data)
+        try JSONResponseDecoder(parsingOptions: parsingOptions).decodeResponseData(data)
     }
 }
 

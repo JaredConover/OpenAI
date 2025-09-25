@@ -81,7 +81,7 @@ struct ImplicitURLSessionStreamingSessionFactory: StreamingSessionFactory {
     ) -> StreamingSession<ModelResponseEventsStreamInterpreter> {
         .init(
             urlRequest: urlRequest,
-            interpreter: .init(),
+            interpreter: .init(parsingOptions: parsingOptions),
             sslDelegate: sslDelegate,
             middlewares: middlewares,
             onReceiveContent: onReceiveContent,
