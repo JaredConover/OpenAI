@@ -127,4 +127,33 @@ public struct ResponseObject: Codable, Equatable, Sendable {
         case usage
         case user
     }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let parsingOptions = decoder.userInfo[.parsingOptions] as? ParsingOptions ?? []
+
+        self.createdAt = try container.decode(Int.self, forKey: .createdAt, parsingOptions: parsingOptions, defaultValue: 0)
+        self.error = try container.decodeIfPresent(Schemas.ResponseError.self, forKey: .error)
+        self.id = try container.decode(String.self, forKey: .id, parsingOptions: parsingOptions, defaultValue: "")
+        self.incompleteDetails = try container.decodeIfPresent(IncompleteDetails.self, forKey: .incompleteDetails)
+        self.instructions = try container.decodeIfPresent(String.self, forKey: .instructions)
+        self.maxOutputTokens = try container.decodeIfPresent(Int.self, forKey: .maxOutputTokens)
+        self.metadata = try container.decode([String: String].self, forKey: .metadata, parsingOptions: parsingOptions, defaultValue: [:])
+        self.model = try container.decode(String.self, forKey: .model, parsingOptions: parsingOptions, defaultValue: "")
+        self.object = try container.decode(String.self, forKey: .object, parsingOptions: parsingOptions, defaultValue: "response")
+        self.output = try container.decode([OutputItem].self, forKey: .output, parsingOptions: parsingOptions, defaultValue: [])
+        self.parallelToolCalls = try container.decode(Bool.self, forKey: .parallelToolCalls, parsingOptions: parsingOptions, defaultValue: false)
+        self.previousResponseId = try container.decodeIfPresent(String.self, forKey: .previousResponseId)
+        self.reasoning = try container.decodeIfPresent(Schemas.Reasoning.self, forKey: .reasoning)
+        self.status = try container.decode(String.self, forKey: .status, parsingOptions: parsingOptions, defaultValue: "")
+        self.temperature = try container.decodeIfPresent(Double.self, forKey: .temperature)
+        self.text = try container.decode(ResponseProperties.TextPayload.self, forKey: .text)
+        self.toolChoice = try container.decode(ResponseProperties.ToolChoicePayload.self, forKey: .toolChoice)
+        self.tools = try container.decode([Tool].self, forKey: .tools, parsingOptions: parsingOptions, defaultValue: [])
+        self.topP = try container.decodeIfPresent(Double.self, forKey: .topP)
+        self.truncation = try container.decodeIfPresent(String.self, forKey: .truncation)
+        self.usage = try container.decodeIfPresent(Schemas.ResponseUsage.self, forKey: .usage)
+        self.user = try container.decodeIfPresent(String.self, forKey: .user)
+    }
+
 }
