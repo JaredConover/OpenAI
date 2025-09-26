@@ -38,4 +38,38 @@ extension KeyedDecodingContainer {
             }
         }
     }
+
+    /// Apply the parsing options to non-primitive types allowing relaxed parsing when specified.
+    /// Useful for alternative or custom implementations that may not return all properties in the JSON.
+    func decodeRequiredComplex<T: Decodable>(_ type: T.Type, forKey key: KeyedDecodingContainer<K>.Key, parsingOptions: ParsingOptions) throws -> T? {
+        if let value = try self.decodeIfPresent(T.self, forKey: key) {
+            return value
+        }
+
+        if self.contains(key) {
+            if parsingOptions.contains(.fillRequiredFieldIfValueNotFound) {
+                return nil
+            } else {
+                throw DecodingError.valueNotFound(
+                    T.self,
+                    DecodingError.Context(
+                        codingPath: self.codingPath + [key],
+                        debugDescription: "Value not found for key '\(key.stringValue)'"
+                    )
+                )
+            }
+        } else {
+            if parsingOptions.contains(.fillRequiredFieldIfKeyNotFound) {
+                return nil
+            } else {
+                throw DecodingError.keyNotFound(
+                    key,
+                    DecodingError.Context(
+                        codingPath: self.codingPath + [key],
+                        debugDescription: "Missing required key '\(key.stringValue)'"
+                    )
+                )
+            }
+        }
+    }
 }

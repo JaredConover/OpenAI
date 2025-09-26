@@ -70,11 +70,11 @@ public struct ResponseObject: Codable, Equatable, Sendable {
     /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more:
     /// - [Text inputs and outputs](https://platform.openai.com/docs/guides/text)
     /// - [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)
-    public let text: ResponseProperties.TextPayload
-    
+    public let text: ResponseProperties.TextPayload?
+
     /// How the model should select which tool (or tools) to use when generating a response. See the `tools` parameter to see how to specify which tools the model can call.
-    public let toolChoice: ResponseProperties.ToolChoicePayload
-    
+    public let toolChoice: ResponseProperties.ToolChoicePayload?
+
     /// An array of tools the model may call while generating a response. You can specify which tool to use by setting the `tool_choice` parameter.
     ///
     /// The two categories of tools you can provide the model are:
@@ -147,8 +147,8 @@ public struct ResponseObject: Codable, Equatable, Sendable {
         self.reasoning = try container.decodeIfPresent(Schemas.Reasoning.self, forKey: .reasoning)
         self.status = try container.decode(String.self, forKey: .status, parsingOptions: parsingOptions, defaultValue: "")
         self.temperature = try container.decodeIfPresent(Double.self, forKey: .temperature)
-        self.text = try container.decode(ResponseProperties.TextPayload.self, forKey: .text)
-        self.toolChoice = try container.decode(ResponseProperties.ToolChoicePayload.self, forKey: .toolChoice)
+        self.text = try container.decodeRequiredComplex(ResponseProperties.TextPayload.self, forKey: .text, parsingOptions: parsingOptions)
+        self.toolChoice = try container.decodeRequiredComplex(ResponseProperties.ToolChoicePayload.self, forKey: .toolChoice, parsingOptions: parsingOptions)
         self.tools = try container.decode([Tool].self, forKey: .tools, parsingOptions: parsingOptions, defaultValue: [])
         self.topP = try container.decodeIfPresent(Double.self, forKey: .topP)
         self.truncation = try container.decodeIfPresent(String.self, forKey: .truncation)
